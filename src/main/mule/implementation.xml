@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getInsuranceQuotes" doc:id="3352eb7c-0a32-41aa-9d0f-9158325b9a22" >
+		<set-variable value="#[attributes.queryParams.insurance_type]" doc:name="InsuranceType" doc:id="30c14b72-5410-4c1b-a674-fcd821315056" variableName="insurance_type"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="9448f0f5-9af6-4035-a62c-49ee7e29e562" >
+			<route >
+				<try doc:name="Try" doc:id="f1e03da4-db84-482a-bf12-7eed2ab3e584" >
+					<db:select doc:name="ICICI" doc:id="36b72871-53f2-4d37-a109-6a854620b8b2" config-ref="Database_Config">
+						<db:sql ><![CDATA[select * from policy where insurer = 'ICICI' and policytype = :policytype]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{policytype : vars.insurance_type}]]]></db:input-parameters>
+					</db:select>
+					<ee:transform doc:name="Transform Message" doc:id="18667246-7aae-41af-9256-85f196b4bf8e" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="23bf9dbf-17cd-40ec-b95c-45410e9591ee" type="ANY">
+							<ee:transform doc:name="Transform Message" doc:id="0a8d3e58-a221-44d7-8c70-2c5d91f5b611" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+			<route >
+				<try doc:name="Try" doc:id="60fa7424-6d6d-471d-8757-df35e2bf1e46" >
+					<db:select doc:name="HDFC" doc:id="e173a593-5053-4d8f-aee0-28a759bcc5e0" config-ref="Database_Config" >
+						<db:sql ><![CDATA[select * from policy where insurer = 'HDFC' and policytype = :policytype]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{policytype : vars.insurance_type}]]]></db:input-parameters>
+					</db:select>
+					<ee:transform doc:name="Transform Message" doc:id="016c51c7-7b42-4db7-a2b1-920aa261179a" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="63871635-d673-4a19-8319-02a44e7d46d1" type="ANY">
+							<ee:transform doc:name="Transform Message" doc:id="61c49dcc-2cf3-4b44-879e-3314fa94458c" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+			<route >
+				<try doc:name="Try" doc:id="0d635658-0e28-426c-8080-93085a37cc2e" >
+					<db:select doc:name="SBI" doc:id="114ae22b-3e76-49e5-afcd-699e6cf10da8" config-ref="Database_Config" >
+						<db:sql ><![CDATA[select * from policy where insurer = 'SBI' and policytype = :policytype]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{policytype : vars.insurance_type}]]]></db:input-parameters>
+					</db:select>
+					<ee:transform doc:name="Transform Message" doc:id="b9d29f37-2ec5-4cf6-aee4-44fa56ebbfce" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5230508f-1c67-4e08-92d9-796f5bf70a00" type="ANY">
+							<ee:transform doc:name="Transform Message" doc:id="f3f58f4b-a33b-4444-a835-00cea2d043c9" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="Transform Message" doc:id="83717bea-bb41-417d-94dc-7c80bc24d331">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+flatten(payload..payload)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ea5a44bb-f71f-4f1e-aa4f-bed475b99128" message="#[payload]"/>
+	</flow>
+</mule>
